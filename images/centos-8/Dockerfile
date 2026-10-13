@@ -9,14 +9,14 @@ RUN chmod +x /usr/bin/tini
 # It means that CentOS 8 will no longer receive development resources from the official CentOS project.
 # After Dec 31st, 2021, if you need to update your CentOS, you need to change the mirrors to vault.centos.org where they will be archived permanently.
 # Alternatively, you may want to upgrade to CentOS Stream.
-RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-* ;\
-    sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-* ;\
-    yum update -y ;\
-    yum install 'dnf-command(config-manager)' -y ;\
-    yum config-manager --set-enabled powertools -y ;\
-    yum install epel-release -y ;\
-    yum install cracklib-devel cyrus-sasl-devel gcc groff krb5-devel libevent-devel libsodium-devel libtool-ltdl-devel make openssl-devel pandoc systemd -y ;\
-    yum install rpm-build rpmdevtools git -y ;\
+RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-* && \
+    sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-* && \
+    yum update -y && \
+    yum install 'dnf-command(config-manager)' -y && \
+    yum config-manager --set-enabled powertools -y && \
+    yum install epel-release -y && \
+    yum install cracklib-devel cyrus-sasl-devel gcc groff krb5-devel libevent-devel libsodium-devel libtool-ltdl-devel make openssl-devel pandoc systemd -y && \
+    yum install rpm-build rpmdevtools git -y && \
     yum clean all
 
 COPY run/build-packages.sh /opt

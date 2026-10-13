@@ -5,12 +5,12 @@ ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /usr/
 RUN chmod +x /usr/bin/tini
 
 # Install dependencies for rockylinux
-RUN yum update -y ;\
-    dnf install 'dnf-command(config-manager)' -y ;\
-    dnf config-manager --set-enabled crb ;\
-    yum install epel-release -y ;\
-    yum install cracklib-devel cyrus-sasl-devel gcc groff krb5-devel libevent-devel libsodium-devel libtool-ltdl-devel make openssl-devel pandoc systemd -y ;\
-    yum install rpm-build rpmdevtools git -y ;\
+RUN yum update -y && \
+    dnf install 'dnf-command(config-manager)' -y && \
+    dnf config-manager --set-enabled crb && \
+    yum install epel-release -y && \
+    yum install cracklib-devel cyrus-sasl-devel gcc groff krb5-devel libevent-devel libsodium-devel libtool-ltdl-devel make openssl-devel pandoc systemd -y && \
+    yum install rpm-build rpmdevtools git -y && \
     yum clean all
 
 COPY run/build-packages.sh /opt

@@ -6,9 +6,9 @@ set -u
 # Variables
 ################################################################################
 
-declare -A DIRS=(["debian"]="10 11 12 13" ["centos"]="7" ["rockylinux"]="8 9 10" ["ubuntu"]="22.04" )
+declare -A DIRS=(["debian"]="10 11 12 13 14" ["centos"]="7" ["rockylinux"]="8 9 10" ["ubuntu"]="22.04 26.04" )
 
-declare -A DEB_DISTS=(["10"]="buster" ["11"]="bullseye" ["12"]="bookworm" ["13"]="trixie" ["22.04"]="jammy")
+declare -A DEB_DISTS=(["10"]="buster" ["11"]="bullseye" ["12"]="bookworm" ["13"]="trixie" ["14"]="forky" ["22.04"]="jammy" ["26.04"]="resolute")
 declare -A RH_DISTS=(["7"]="el7" ["8"]="el8" ["9"]="el9" ["10"]="el10")
 
 VERSIONS=("2.6.15" "2.7.1")

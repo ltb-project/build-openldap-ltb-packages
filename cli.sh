@@ -17,10 +17,12 @@ declare -A DISTRIBUTIONS=( ["centos-7-ltb"]="images/centos-7" \
                            ["debian-11-ltb"]="images/debian-11" \
                            ["debian-12-ltb"]="images/debian-12" \
                            ["debian-13-ltb"]="images/debian-13" \
+                           ["debian-14-ltb"]="images/debian-14" \
                            ["rockylinux-8-ltb"]="images/rockylinux-8" \
                            ["rockylinux-9-ltb"]="images/rockylinux-9" \
                            ["rockylinux-10-ltb"]="images/rockylinux-10" \
                            ["ubuntu-22.04-ltb"]="images/ubuntu-22.04" \
+                           ["ubuntu-26.04-ltb"]="images/ubuntu-26.04" \
                          )
 IMAGE_VERSION="0.1"
 
@@ -36,19 +38,29 @@ declare -A OPENLDAP_VERSIONS=( ["2.6.15"]="openldap26" \
 # Functions
 ################################################################################
 
+
+print_sorted_values() {
+    local sorted=()
+    while IFS= read -rd '' key; do
+        sorted+=( "$key" )
+    done < <(printf '%s\0' "$@" | sort -z)
+    for key in "${!sorted[@]}"; do printf "%s " "${sorted[${key}]}" ; done
+    echo
+}
+
 select_images() {
     if [ -z "${1}" ]; then
-        DISTS=${!DISTRIBUTIONS[@]}
+        DISTS=$( print_sorted_values ${!DISTRIBUTIONS[@]} )
     else
-        DISTS=${@}
+        DISTS=$( print_sorted_values ${@} )
     fi
 }
 
 select_versions() {
     if [ -z "${1}" ]; then
-        VERSIONS=${!OPENLDAP_VERSIONS[@]}
+        VERSIONS=$( print_sorted_values ${!OPENLDAP_VERSIONS[@]} )
     else
-        VERSIONS=${@}
+        VERSIONS=$( print_sorted_values ${@} )
     fi
 }
 
@@ -266,10 +278,10 @@ case ${POSITIONAL_ARGS[0]} in
     echo "  fetch-packages: fetch packages built previously, for given DISTRIBUTIONS and OPENLDAP_VERSIONS"
     echo
     echo "Declared DISTRIBUTIONS images:"
-    echo ${!DISTRIBUTIONS[@]}
+    echo $( print_sorted_values ${!DISTRIBUTIONS[@]} )
     echo
     echo "Declared OPENLDAP_VERSIONS:"
-    echo ${!OPENLDAP_VERSIONS[@]}
+    echo $( print_sorted_values ${!OPENLDAP_VERSIONS[@]} )
     echo
     echo "Selected images: ${DISTS}"
     echo "Selected versions: ${VERSIONS}"
@@ -277,4 +289,3 @@ case ${POSITIONAL_ARGS[0]} in
     ;;
 
 esac
-
