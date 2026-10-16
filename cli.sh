@@ -32,6 +32,9 @@ declare -A OPENLDAP_VERSIONS=( ["2.6.15"]="openldap26" \
                                ["2.7.1"]="openldap27" \
                              )
 
+RED="\e[31m"
+GREEN="\e[32m"
+ENDCOLOR="\e[0m"
 
 
 ################################################################################
@@ -180,6 +183,38 @@ fetch_packages () {
     cd ..
 }
 
+test_packages () {
+
+    echo "Test packages OpenLDAP-LTB"
+    for DISTRIBUTION in ${DISTS}; do
+        for OPENLDAP_VERSION in ${VERSIONS}; do
+            mkdir -p run/volumes/${DISTRIBUTION}-openldap-${OPENLDAP_VERSION}
+            EXIT_CODE=0
+            OUTPUT="$( 
+                ${CTN} run \
+                        -v ${PWD}/run/volumes/${DISTRIBUTION}-openldap-${OPENLDAP_VERSION}:/packages \
+                        --env OPENLDAP_VERSION=${OPENLDAP_VERSION} \
+                        --env LTB_REPOSITORY_REFERENCE=${OPENLDAP_VERSIONS[${OPENLDAP_VERSION}]} \
+                        --name=${DISTRIBUTION}-openldap-${OPENLDAP_VERSION}-test \
+                        --entrypoint=/opt/test-packages.sh \
+                        ${DISTRIBUTION}:${IMAGE_VERSION} 2>&1
+            )" || EXIT_CODE=$?
+
+            if [ "${EXIT_CODE}" -eq "0" ]; then
+                echo -e "OpenLDAP-LTB ${OPENLDAP_VERSION} for ${DISTRIBUTION} distribution: ${GREEN}packages OK${ENDCOLOR}"
+                ${CTN} rm "${DISTRIBUTION}-openldap-${OPENLDAP_VERSION}-test" >/dev/null
+            else
+                echo -e "OpenLDAP-LTB ${OPENLDAP_VERSION} for ${DISTRIBUTION} distribution: ${RED}packages KO${ENDCOLOR}"
+                echo -e "$OUTPUT"
+                ${CTN} rm "${DISTRIBUTION}-openldap-${OPENLDAP_VERSION}-test" >/dev/null
+                exit 1
+            fi
+
+        done
+    done
+
+}
+
 
 
 ################################################################################
@@ -262,8 +297,15 @@ case ${POSITIONAL_ARGS[0]} in
       exit 0
       ;;
 
+    test-packages | test-package)
+      echo "Selected images: ${DISTS}"
+      echo "Selected versions: ${VERSIONS}"
+      test_packages
+      exit 0
+      ;;
+
   *)
-    echo "$0 [-i|--image image1,image2] [-v|--version version1,version2] [build-images|build-packages|remove-images|remove-containers|run-containers|fetch-packages]"
+    echo "$0 [-i|--image image1,image2] [-v|--version version1,version2] [build-images|build-packages|test-packages|remove-images|remove-containers|run-containers|fetch-packages]"
     echo
     echo "OPTIONS"
     echo "  -i: optional, name of the docker image to consider. If empty, use all images in DISTRIBUTIONS"
@@ -276,6 +318,7 @@ case ${POSITIONAL_ARGS[0]} in
     echo "  remove-containers: remove container for every OPENLDAP_VERSIONS of given images"
     echo "  run-containers: run container for every OPENLDAP_VERSIONS of given images without building the package"
     echo "  fetch-packages: fetch packages built previously, for given DISTRIBUTIONS and OPENLDAP_VERSIONS"
+    echo "  test-packages: test packages built previously, for given DISTRIBUTIONS and OPENLDAP_VERSIONS"
     echo
     echo "Declared DISTRIBUTIONS images:"
     echo $( print_sorted_values ${!DISTRIBUTIONS[@]} )
