@@ -28,8 +28,8 @@ IMAGE_VERSION="0.1"
 
 # associative array :
 # OpenLDAP version => reference to git branch, commit, or tag on LTB repository
-declare -A OPENLDAP_VERSIONS=( ["2.6.15"]="openldap26" \
-                               ["2.7.1"]="openldap27" \
+declare -A OPENLDAP_VERSIONS=( ["2.6.16"]="openldap26" \
+                               ["2.7.2"]="openldap27" \
                              )
 
 RED="\e[31m"
